@@ -1,13 +1,6 @@
-var mapping = {};
-{
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', chrome.extension.getURL('./mapping.json'), true);
-    xhr.onreadystatechange = function() {
-        if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-            mapping = JSON.parse(xhr.responseText);
-        }
-    };
-    xhr.send();
+function decodeTdBeacon(raw) {
+    decoded = atob(decodeURIComponent(raw));
+    return JSON.parse(decoded);
 }
 
 chrome.webRequest.onBeforeRequest.addListener(
@@ -17,18 +10,18 @@ chrome.webRequest.onBeforeRequest.addListener(
             windowId: chrome.windows.WINDOW_ID_CURRENT
         }, (result) => {
             var currentTab = result.shift();
-            if (details.url.match(/\/ingestly-ingest\/.*/)) {
+            if (details.url.match(/\/event\/.*?\?api_key=.*?&data=.*&callback.*/)) {
                 var parser = new URL(details.url);
-                var response = {
-                    Protocol: {Column: '__n/a__', Value: parser.protocol},
-                    Endpoint: {Column: '__n/a__', Value: parser.hostname}
-                };
-                for(var param of parser.searchParams){
-                    response[param[0]] = {
-                        Column: mapping[param[0]],
-                        Value: param[1]
-                    };
-                }
+                var pathItems = parser.pathname.split('/');
+                var response = decodeTdBeacon(parser.searchParams.get("data"));
+                response['(protocol)'] = parser.protocol;
+                response['(endpoint)'] = parser.hostname;
+                response['(sdk)'] = pathItems[1];
+                response['(database)'] = pathItems[4];
+                response['(table)'] = pathItems[5];
+                response['(apiKey)'] = parser.searchParams.get("api_key");
+                response['(modified)'] = parser.searchParams.get("modified");
+                response['(callback)'] = parser.searchParams.get("callback");
                 chrome.tabs.sendMessage(currentTab.id, response);
             }
         });
@@ -36,4 +29,3 @@ chrome.webRequest.onBeforeRequest.addListener(
     {urls: ['<all_urls>']},
     []
 );
-
