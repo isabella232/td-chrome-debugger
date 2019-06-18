@@ -1,5 +1,5 @@
 function decodeTdBeacon(raw) {
-    decoded = atob(decodeURIComponent(raw));
+    decoded = decodeURIComponent(escape(atob(raw)));
     return JSON.parse(decoded);
 }
 
