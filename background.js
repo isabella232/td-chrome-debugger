@@ -13,15 +13,25 @@ chrome.webRequest.onBeforeRequest.addListener(
             if (details.url.match(/\/event\/.*?\?api_key=.*?&data=.*&callback.*/)) {
                 var parser = new URL(details.url);
                 var pathItems = parser.pathname.split('/');
-                var response = decodeTdBeacon(parser.searchParams.get("data"));
-                response['(protocol)'] = parser.protocol;
-                response['(endpoint)'] = parser.hostname;
-                response['(sdk)'] = pathItems[1];
-                response['(database)'] = pathItems[4];
-                response['(table)'] = pathItems[5];
-                response['(apiKey)'] = parser.searchParams.get("api_key");
-                response['(modified)'] = parser.searchParams.get("modified");
-                response['(callback)'] = parser.searchParams.get("callback");
+                var response = {
+                    '(protocol)': parser.protocol,
+                    '(endpoint)':parser.hostname,
+                    '(sdk)':pathItems[1],
+                    '(database)':pathItems[4],
+                    '(table)':pathItems[5],
+                    '(apiKey)':parser.searchParams.get("api_key"),
+                    '(modified)':parser.searchParams.get("modified"),
+                    '(callback)':parser.searchParams.get("callback")
+                };
+                var data = decodeTdBeacon(parser.searchParams.get("data"));
+
+                for (var key in data) {
+                    if(typeof data[key] === 'object'){
+                        response[key] = JSON.stringify(data[key]);
+                    }else{
+                        response[key] = data[key];
+                    }
+                }
                 chrome.tabs.sendMessage(currentTab.id, response);
             }
         });
