@@ -8,7 +8,7 @@
 ![Screenshot](./screenshot.png)
 
 
-## Installl
+## Installation
 1. Clone or Download this repository.
 2. Open Chrome's extension page
 3. Enable "Developer Mode"
