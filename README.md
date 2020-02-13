@@ -1,5 +1,7 @@
 # Treasure Data TD-JS-SDK debugger for Chrome
 
+[Japanese document available here / 日本語のドキュメントはこちら](./README-JP.md)
+
 ## What is this?
 - A Chrome Extension for debugging Treasure Data's TD-JS-SDK web beacons.
 - In Console tab of Chrome's developer tool, the extension shows a table of payload sent to Treasure Data.
@@ -10,7 +12,7 @@
 
 ## Installation
 
-### A. Install the packaged file
+### A. Install the packaged file (Deprecated in Chrome 80)
 1. Download the packaged extension `td-chrome-debugger.crx`.
 2. Open Chrome's extension page.
 3. Drag & drop `td-chrome-debugger.crx` to the Chrome window.
